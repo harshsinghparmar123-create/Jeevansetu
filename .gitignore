@@ -1,0 +1,28 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+venv/
+ENV/
+env/
+
+# Databases
+backend/*.db
+backend/*.sqlite
+backend/golden_minute.db
+
+# Secrets & Environment configs
+backend/.env
+backend/firebase-key.json
+*.json
+
+# IDE configs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

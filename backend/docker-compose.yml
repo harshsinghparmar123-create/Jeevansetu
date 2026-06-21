@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/workspace
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/golden_minute
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=supersecretjwtkeythatisproductionreadyandlongenough321
+      - FIREBASE_CREDENTIALS_PATH=/workspace/firebase-key.json
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - golden_network
+
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=golden_minute
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d golden_minute"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - golden_network
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - golden_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  golden_network:
+    driver: bridge
